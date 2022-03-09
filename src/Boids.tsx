@@ -76,6 +76,12 @@ const Systems = () => {
       max: 10,
       step: 0.25
     },
+    avoidEdgeFactor: {
+      value: 1,
+      min: 0,
+      max: 10,
+      step: 0.25
+    },
     maxVelocity: {
       value: 50,
       min: 0,
@@ -90,7 +96,7 @@ const Systems = () => {
     alignmentSystem(dt, config.alignmentFactor)
     cohesionSystem(dt, config.cohesionFactor)
     separationSystem(dt, config.separationFactor)
-    avoidEdgeSystem(dt)
+    avoidEdgeSystem(dt, config.avoidEdgeFactor)
 
     /* System */
     velocitySystem(dt, config.maxVelocity)
@@ -123,10 +129,15 @@ const velocitySystem = (dt: number, limit = 10) => {
   }
 }
 
-const avoidEdgeSystem = (dt: number) => {
+const avoidEdgeSystem = (dt: number, factor = 1) => {
   for (const { transform, velocity } of withVelocity.entities) {
     if (transform.position.length() > 100) {
-      velocity.add(tmpvec3.copy(transform.position).divideScalar(-100).multiplyScalar(dt))
+      velocity.add(
+        tmpvec3
+          .copy(transform.position)
+          .divideScalar(-100)
+          .multiplyScalar(dt * factor)
+      )
     }
   }
 }
