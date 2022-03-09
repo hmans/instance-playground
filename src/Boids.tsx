@@ -53,8 +53,9 @@ const Systems = () => {
     /* Boids */
     findFriendsSystem()
     alignmentSystem(dt)
-    cohesionSystem(dt, 10)
+    cohesionSystem(dt, 3)
     avoidEdgeSystem(dt)
+    separationSystem(dt)
 
     /* System */
     velocitySystem(dt)
@@ -79,8 +80,9 @@ const withVelocity = ecs.world.archetype("velocity", "transform")
 const withFriends = ecs.world.archetype("friends")
 const withBoid = ecs.world.archetype("boid")
 
-const velocitySystem = (dt: number) => {
+const velocitySystem = (dt: number, limit = 10) => {
   for (const { velocity, transform } of withVelocity.entities) {
+    velocity.clampLength(0, limit)
     transform.position.add(tmpvec3.copy(velocity).multiplyScalar(dt))
   }
 }
@@ -125,6 +127,22 @@ const cohesionSystem = (dt: number, factor = 1) => {
         .sub(transform.position)
         .normalize()
         .multiplyScalar(dt * factor)
+    )
+  }
+}
+
+const separationSystem = (dt: number, factor = 1) => {
+  for (const { friends, velocity, transform } of withFriends.entities) {
+    velocity.add(
+      friends
+        .reduce(
+          (acc, friend) =>
+            acc.add(tmpvec3.copy(friend.transform.position).sub(transform.position)),
+          new Vector3()
+        )
+        .divideScalar(withFriends.entities.length || 1)
+        .normalize()
+        .multiplyScalar(dt * -factor)
     )
   }
 }
