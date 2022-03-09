@@ -1,5 +1,6 @@
 import { PerspectiveCamera } from "@react-three/drei"
 import { useFrame } from "@react-three/fiber"
+import { useControls } from "leva"
 import { IEntity, Tag } from "miniplex"
 import { createECS } from "miniplex/react"
 import { between, insideSphere } from "randomish"
@@ -23,7 +24,7 @@ export const Boids: FC = () => {
     <>
       <ambientLight />
       <directionalLight />
-      <PerspectiveCamera position={[0, 0, 120]} makeDefault />
+      <PerspectiveCamera position={[0, 0, 200]} makeDefault />
       <Systems />
 
       <Boid.Root>
@@ -49,16 +50,49 @@ export const Boids: FC = () => {
 }
 
 const Systems = () => {
+  const config = useControls({
+    friendRadius: {
+      value: 30,
+      min: 0,
+      max: 100,
+      step: 1
+    },
+    alignmentFactor: {
+      value: 1,
+      min: 0,
+      max: 10,
+      step: 0.25
+    },
+    cohesionFactor: {
+      value: 1,
+      min: 0,
+      max: 10,
+      step: 0.25
+    },
+    separationFactor: {
+      value: 1,
+      min: 0,
+      max: 10,
+      step: 0.25
+    },
+    maxVelocity: {
+      value: 50,
+      min: 0,
+      max: 100,
+      step: 1
+    }
+  })
+
   useFrame((_, dt) => {
     /* Boids */
-    findFriendsSystem()
-    alignmentSystem(dt)
-    cohesionSystem(dt, 3)
+    findFriendsSystem(config.friendRadius)
+    alignmentSystem(dt, config.alignmentFactor)
+    cohesionSystem(dt, config.cohesionFactor)
+    separationSystem(dt, config.separationFactor)
     avoidEdgeSystem(dt)
-    separationSystem(dt)
 
     /* System */
-    velocitySystem(dt)
+    velocitySystem(dt, config.maxVelocity)
   })
 
   return null
