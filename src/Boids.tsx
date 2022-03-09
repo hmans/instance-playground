@@ -22,8 +22,9 @@ const Boid = makeInstanceComponents()
 export const Boids: FC = () => {
   return (
     <>
-      <ambientLight />
-      <directionalLight />
+      <ambientLight intensity={0.2} />
+      <directionalLight position={[10, 10, 10]} intensity={0.4} />
+      <fog attach="fog" args={["black", 128, 512]} />
       <PerspectiveCamera position={[0, 0, 200]} makeDefault />
       <Systems />
 
@@ -105,6 +106,7 @@ const initializeBoidTransform = (entity: Entity, group: Group) => {
     ecs.world.addComponent(entity, "transform", group)
 
     group.position.copy(insideSphere(100) as Vector3)
+    group.scale.setScalar(1 + Math.pow(Math.random(), 4) * 3)
   }
 }
 
