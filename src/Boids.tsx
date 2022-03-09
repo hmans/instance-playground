@@ -33,7 +33,7 @@ export const Boids: FC = () => {
         <meshStandardMaterial color="#eee" />
       </Boid.Root>
 
-      <ecs.Collection tag="boid" initial={3000}>
+      <ecs.Collection tag="boid" initial={1000}>
         {(entity) => (
           <group ref={(group) => initializeBoidTransform(entity, group!)}>
             <ecs.Component
