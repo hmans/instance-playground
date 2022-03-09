@@ -1,14 +1,10 @@
-import { Box } from "@react-three/drei";
-import { Canvas } from "@react-three/fiber";
+import { Canvas } from "@react-three/fiber"
+import { Boids } from "./Boids"
 
 const App = () => (
   <Canvas>
-    <ambientLight />
-    <directionalLight />
-    <Box>
-      <meshStandardMaterial color="hotpink" />
-    </Box>
+    <Boids />
   </Canvas>
-);
+)
 
-export default App;
+export default App
