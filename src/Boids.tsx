@@ -24,7 +24,7 @@ export const Boids: FC = () => {
     <>
       <ambientLight intensity={0.2} />
       <directionalLight position={[10, 10, 10]} intensity={0.4} />
-      <fog attach="fog" args={["black", 128, 512]} />
+      <fog attach="fog" args={["black", 256, 1024]} />
       <PerspectiveCamera position={[0, 0, 200]} makeDefault />
       <Systems />
 
