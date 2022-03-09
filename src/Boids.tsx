@@ -48,6 +48,7 @@ export const Boids: FC = () => {
 
 const Systems = () => {
   useFrame((_, dt) => {
+    findFriendsSystem()
     velocitySystem(dt)
     avoidEdgeSystem(dt)
   })
@@ -68,6 +69,8 @@ const initializeBoidTransform = (entity: Entity, group: Group) => {
 const tmpvec3 = new Vector3()
 
 const withVelocity = ecs.world.archetype("velocity", "transform")
+const withFriends = ecs.world.archetype("friends")
+const withBoid = ecs.world.archetype("boid")
 
 const velocitySystem = (dt: number) => {
   for (const { velocity, transform } of withVelocity.entities) {
@@ -79,6 +82,17 @@ const avoidEdgeSystem = (dt: number) => {
   for (const { transform, velocity } of withVelocity.entities) {
     if (transform.position.length() > 100) {
       velocity.add(tmpvec3.copy(transform.position).divideScalar(-100).multiplyScalar(dt))
+    }
+  }
+}
+
+const findFriendsSystem = (radius = 10) => {
+  for (const entity of withFriends.entities) {
+    entity.friends = []
+    for (const other of withBoid.entities) {
+      if (entity.transform.position.distanceTo(other.transform.position) < radius) {
+        entity.friends.push(other)
+      }
     }
   }
 }
