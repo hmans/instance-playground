@@ -49,6 +49,7 @@ export const Boids: FC = () => {
 const Systems = () => {
   useFrame((_, dt) => {
     velocitySystem(dt)
+    avoidEdgeSystem(dt)
   })
 
   return null
@@ -60,8 +61,7 @@ const initializeBoidTransform = (entity: Entity, group: Group) => {
   } else {
     ecs.world.addComponent(entity, "transform", group)
 
-    const pos = insideSphere()
-    group.position.set(pos.x * 100, pos.y * 100, pos.z * 100)
+    group.position.copy(insideSphere(100) as Vector3)
   }
 }
 
@@ -72,5 +72,13 @@ const withVelocity = ecs.world.archetype("velocity", "transform")
 const velocitySystem = (dt: number) => {
   for (const { velocity, transform } of withVelocity.entities) {
     transform.position.add(tmpvec3.copy(velocity).multiplyScalar(dt))
+  }
+}
+
+const avoidEdgeSystem = (dt: number) => {
+  for (const { transform, velocity } of withVelocity.entities) {
+    if (transform.position.length() > 100) {
+      velocity.add(tmpvec3.copy(transform.position).divideScalar(-100).multiplyScalar(dt))
+    }
   }
 }
