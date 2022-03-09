@@ -38,6 +38,8 @@ export const Boids: FC = () => {
               name="velocity"
               data={new Vector3().randomDirection().multiplyScalar(between(2, 10))}
             />
+            <ecs.Component name="friends" data={[]} />
+
             <Boid.Instance />
           </group>
         )}
@@ -48,9 +50,14 @@ export const Boids: FC = () => {
 
 const Systems = () => {
   useFrame((_, dt) => {
+    /* Boids */
     findFriendsSystem()
-    velocitySystem(dt)
+    alignmentSystem(dt)
+    cohesionSystem(dt, 10)
     avoidEdgeSystem(dt)
+
+    /* System */
+    velocitySystem(dt)
   })
 
   return null
@@ -86,7 +93,7 @@ const avoidEdgeSystem = (dt: number) => {
   }
 }
 
-const findFriendsSystem = (radius = 10) => {
+const findFriendsSystem = (radius = 30) => {
   for (const entity of withFriends.entities) {
     entity.friends = []
     for (const other of withBoid.entities) {
@@ -94,5 +101,30 @@ const findFriendsSystem = (radius = 10) => {
         entity.friends.push(other)
       }
     }
+  }
+}
+
+const alignmentSystem = (dt: number, factor = 1) => {
+  for (const { friends, velocity } of withFriends.entities) {
+    velocity.add(
+      friends
+        .reduce((acc, friend) => acc.add(friend.velocity), new Vector3())
+        .divideScalar(withFriends.entities.length || 1)
+        .normalize()
+        .multiplyScalar(dt * factor)
+    )
+  }
+}
+
+const cohesionSystem = (dt: number, factor = 1) => {
+  for (const { friends, velocity, transform } of withFriends.entities) {
+    velocity.add(
+      friends
+        .reduce((acc, friend) => acc.add(friend.transform.position), new Vector3())
+        .divideScalar(withFriends.entities.length || 1)
+        .sub(transform.position)
+        .normalize()
+        .multiplyScalar(dt * factor)
+    )
   }
 }
