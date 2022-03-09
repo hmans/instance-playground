@@ -3,7 +3,7 @@ import { useFrame } from "@react-three/fiber"
 import { useControls } from "leva"
 import { IEntity, Tag } from "miniplex"
 import { createECS } from "miniplex/react"
-import { between, insideSphere } from "randomish"
+import { between, chance, insideSphere } from "randomish"
 import { FC } from "react"
 import { Group, Object3D, Vector3 } from "three"
 import { makeInstanceComponents } from "./lib/Instances"
@@ -32,7 +32,7 @@ export const Boids: FC = () => {
         <meshStandardMaterial color="#eee" />
       </Boid.Root>
 
-      <ecs.Collection tag="boid" initial={300}>
+      <ecs.Collection tag="boid" initial={3000}>
         {(entity) => (
           <group ref={(group) => initializeBoidTransform(entity, group!)}>
             <ecs.Component
@@ -131,6 +131,10 @@ const avoidEdgeSystem = (dt: number) => {
 
 const findFriendsSystem = (radius = 30) => {
   for (const entity of withFriends.entities) {
+    /* The way we're finding friends is very expensive, so as a stupid little performance hack,
+       let's only do it 20% of the time. */
+    if (chance(0.8)) continue
+
     entity.friends = []
     for (const other of withBoid.entities) {
       if (entity.transform.position.distanceTo(other.transform.position) < radius) {
