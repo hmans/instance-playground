@@ -792,10 +792,20 @@ loose-envify@^1.1.0, loose-envify@^1.4.0:
   dependencies:
     js-tokens "^3.0.0 || ^4.0.0"
 
+merge-refs@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/merge-refs/-/merge-refs-1.0.0.tgz#388348bce22e623782c6df9d3c4fc55888276120"
+  integrity sha512-WZ4S5wqD9FCR9hxkLgvcHJCBxzXzy3VVE6p8W2OzxRzB+hLRlcadGE2bW9xp2KSzk10rvp4y+pwwKO6JQVguMg==
+
 minimist@^1.2.5:
   version "1.2.5"
   resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.5.tgz#67d66014b66a6a8aaa0c083c5fd58df4e4e97602"
   integrity sha512-FM9nNUYrRBAELZQT3xeZQ7fmMOBg6nWNmJKTcgsJeaLstP/UODVpGsr5OhXhhXg6f+qtJ8uiZ+PUxkDWcgIXLw==
+
+miniplex@^0.6.0:
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/miniplex/-/miniplex-0.6.0.tgz#ec231764b5a77128b1b43076727eb9e64a76ec6e"
+  integrity sha512-6Ya93uhgH+lSsvOpTggD1X8R61bT37dC5adzGGAAl6t/SDSIoes9LvMvJNlj0GQglNuzMOpwMT3ujLtZChkYtQ==
 
 mmd-parser@^1.0.4:
   version "1.0.4"
