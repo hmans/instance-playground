@@ -161,7 +161,7 @@ const alignmentSystem = (dt: number, factor = 1) => {
   for (const { friends, velocity } of withFriends.entities) {
     velocity.add(
       friends
-        .reduce((acc, friend) => acc.add(friend.velocity), new Vector3())
+        .reduce((acc, friend) => acc.add(friend.velocity), tmpvec3.setScalar(0))
         .divideScalar(withFriends.entities.length || 1)
         .normalize()
         .multiplyScalar(dt * factor)
@@ -173,7 +173,7 @@ const cohesionSystem = (dt: number, factor = 1) => {
   for (const { friends, velocity, transform } of withFriends.entities) {
     velocity.add(
       friends
-        .reduce((acc, friend) => acc.add(friend.transform.position), new Vector3())
+        .reduce((acc, friend) => acc.add(friend.transform.position), tmpvec3.setScalar(0))
         .divideScalar(withFriends.entities.length || 1)
         .sub(transform.position)
         .normalize()
@@ -187,9 +187,8 @@ const separationSystem = (dt: number, factor = 1) => {
     velocity.add(
       friends
         .reduce(
-          (acc, friend) =>
-            acc.add(tmpvec3.copy(friend.transform.position).sub(transform.position)),
-          new Vector3()
+          (acc, friend) => acc.add(friend.transform.position).sub(transform.position),
+          tmpvec3.setScalar(0)
         )
         .divideScalar(withFriends.entities.length || 1)
         .normalize()
