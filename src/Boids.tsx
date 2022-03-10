@@ -4,6 +4,7 @@ import { useControls } from "leva"
 import { IEntity, Tag } from "miniplex"
 import { createECS } from "miniplex/react"
 import { between, insideSphere } from "randomish"
+import { FC } from "react"
 import { Object3D, Quaternion, Vector3 } from "three"
 import { makeInstanceComponents } from "./lib/Instances"
 import {
@@ -64,21 +65,23 @@ const Swarm = ({ count = 100 }) => {
     <>
       <Boid.Root material={hull.material} geometry={hull.geometry} />
 
-      <ecs.Collection tag="boid" initial={count}>
-        {(entity) => (
-          <Boid.Instance ref={(o3d) => initializeBoidTransform(entity, o3d)} scale={0.5}>
-            <ecs.Component
-              name="velocity"
-              data={new Vector3().randomDirection().multiplyScalar(between(2, 10))}
-            />
-            <ecs.Component name="friends" data={[]} />
-            <ecs.Component name="spatialHashing" data={{ sht }} />
-          </Boid.Instance>
-        )}
+      <ecs.Collection tag="boid" initial={count} memoize>
+        {(entity) => <BoidEntity entity={entity} />}
       </ecs.Collection>
     </>
   )
 }
+
+const BoidEntity: FC<{ entity: Entity }> = ({ entity }) => (
+  <Boid.Instance ref={(o3d) => initializeBoidTransform(entity, o3d)} scale={0.5}>
+    <ecs.Component
+      name="velocity"
+      data={new Vector3().randomDirection().multiplyScalar(between(2, 10))}
+    />
+    <ecs.Component name="friends" data={[]} />
+    <ecs.Component name="spatialHashing" data={{ sht }} />
+  </Boid.Instance>
+)
 
 const Systems = () => {
   const config = useControls({
