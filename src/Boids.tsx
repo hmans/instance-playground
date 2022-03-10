@@ -256,11 +256,10 @@ const findFriendsSystem = batchedSystem(
       for (let ix = ax; ix <= bx; ix++) {
         for (let iy = ay; iy <= by; iy++) {
           for (let iz = az; iz <= bz; iz++) {
-            const hash = calculateHashForCell([ix, iy, iz])
+            if (candidates.length >= limit) break
 
-            if (candidates.length < limit) {
-              candidates.push(...(sht.get(hash) || []))
-            }
+            const hash = calculateHashForCell([ix, iy, iz])
+            candidates.push(...(sht.get(hash) || []))
           }
         }
       }
