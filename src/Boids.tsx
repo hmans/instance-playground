@@ -3,7 +3,7 @@ import { useFrame } from "@react-three/fiber"
 import { useControls } from "leva"
 import { IEntity, Tag } from "miniplex"
 import { createECS } from "miniplex/react"
-import { between, chance, insideSphere } from "randomish"
+import { between, insideSphere } from "randomish"
 import { FC } from "react"
 import { Group, Object3D, Vector3 } from "three"
 import { makeInstanceComponents } from "./lib/Instances"
@@ -14,7 +14,7 @@ import {
   SpatialHash,
   SpatialHashTable
 } from "./lib/spatialHashing"
-import { system, system2 } from "./lib/systems"
+import { system } from "./lib/systems"
 
 type Entity = {
   transform: Object3D
