@@ -26,6 +26,13 @@ type Entity = {
   }
 } & IEntity
 
+/*
+A bunch of our stuff needs some temporary vec3 and quaternion objects to modify so we don't
+create hundreds of thousands of new objects every frame.
+*/
+const tmpvec3 = new Vector3()
+const tmpquat = new Quaternion()
+
 const sht: SpatialHashTable<Entity> = new Map()
 
 const ecs = createECS<Entity>()
@@ -59,7 +66,7 @@ const Swarm = ({ count = 100 }) => {
 
       <ecs.Collection tag="boid" initial={count}>
         {(entity) => (
-          <Boid.Instance ref={(o3d) => initializeBoidTransform(entity, o3d)}>
+          <Boid.Instance ref={(o3d) => initializeBoidTransform(entity, o3d)} scale={0.5}>
             <ecs.Component
               name="velocity"
               data={new Vector3().randomDirection().multiplyScalar(between(2, 10))}
@@ -136,11 +143,9 @@ const initializeBoidTransform = (entity: Entity, o3d: Object3D | null) => {
     ecs.world.addComponent(entity, "transform", o3d)
 
     o3d.position.copy(insideSphere(100) as Vector3)
+    o3d.quaternion.random()
   }
 }
-
-const tmpvec3 = new Vector3()
-const tmpquat = new Quaternion()
 
 /*
 This job goes through all entities that have a transform and a spatialHashing
