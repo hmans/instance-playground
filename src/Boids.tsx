@@ -1,10 +1,10 @@
-import { PerspectiveCamera } from "@react-three/drei"
+import { PerspectiveCamera, useGLTF } from "@react-three/drei"
 import { useFrame } from "@react-three/fiber"
 import { useControls } from "leva"
 import { IEntity, Tag } from "miniplex"
 import { createECS } from "miniplex/react"
 import { between, insideSphere } from "randomish"
-import { FC } from "react"
+import { FC, Suspense } from "react"
 import { Group, Object3D, Vector3 } from "three"
 import { makeInstanceComponents } from "./lib/Instances"
 import {
@@ -34,18 +34,19 @@ const ecs = createECS<Entity>()
 const Boid = makeInstanceComponents()
 
 export const Boids: FC = () => {
+  const gltf = useGLTF("/models/spaceship25.gltf")
+  const hull = gltf.nodes.Hull as any
+
   return (
     <>
       <ambientLight intensity={0.2} />
       <directionalLight position={[10, 10, 10]} intensity={0.4} />
-      <fog attach="fog" args={["black", 256, 1024]} />
+      <color attach="background" args={["#111"]} />
+      <fog attach="fog" args={["#111", 64, 512]} />
       <PerspectiveCamera position={[0, 0, 200]} makeDefault />
       <Systems />
 
-      <Boid.Root>
-        <sphereGeometry />
-        <meshStandardMaterial color="#eee" />
-      </Boid.Root>
+      <Boid.Root material={hull.material} geometry={hull.geometry} />
 
       <ecs.Collection tag="boid" initial={5000}>
         {(entity) => (
@@ -57,7 +58,7 @@ export const Boids: FC = () => {
             <ecs.Component name="friends" data={[]} />
             <ecs.Component name="spatialHashing" data={{ sht }} />
 
-            <Boid.Instance />
+            <Boid.Instance scale={0.2} />
           </group>
         )}
       </ecs.Collection>
@@ -173,8 +174,14 @@ const velocitySystem = system(
   ecs.world.archetype("velocity", "transform"),
   (entities, dt: number, limit: number = 10) => {
     for (const { velocity, transform } of entities) {
+      /* Clamp velocity */
       velocity.clampLength(0, limit)
+
+      /* Apply velocity to position */
       transform.position.add(tmpvec3.copy(velocity).multiplyScalar(dt))
+
+      /* Rotate entity in the direction of velocity */
+      transform.quaternion.setFromUnitVectors(new Vector3(0, 1, 0), tmpvec3.normalize())
     }
   }
 )
