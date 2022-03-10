@@ -40,6 +40,8 @@ const ecs = createECS<Entity>()
 
 const Boid = makeInstanceComponents()
 
+const Y = new Vector3(0, 1, 0)
+
 export const Boids = () => (
   <>
     {/* Just a bunch of normal r3f stuff. */}
@@ -172,7 +174,7 @@ const spatialHashingSystem = system(
 
         /* Add entity to sht */
         if (!sht.has(hash)) sht.set(hash, [])
-        sht.get(hash)?.push(entity)
+        sht.get(hash)!.push(entity)
 
         /* Remember new hash */
         entity.spatialHashing.previousHash = hash
@@ -196,10 +198,7 @@ const velocitySystem = system(
       transform.position.add(tmpvec3.copy(velocity).multiplyScalar(dt))
 
       /* Rotate entity in the direction of velocity */
-      transform.quaternion.slerp(
-        tmpquat.setFromUnitVectors(new Vector3(0, 1, 0), tmpvec3.normalize()),
-        0.01
-      )
+      transform.quaternion.slerp(tmpquat.setFromUnitVectors(Y, tmpvec3.normalize()), 0.01)
     }
   }
 )
