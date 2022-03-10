@@ -7,10 +7,13 @@ import { between, chance, insideSphere } from "randomish"
 import { FC } from "react"
 import { Group, Object3D, Vector3 } from "three"
 import { makeInstanceComponents } from "./lib/Instances"
-
-type SpatialHash = string
-
-const sht: Map<SpatialHash, Entity[]> = new Map()
+import {
+  calculateCell,
+  calculateHashForCell,
+  calculateHashForPosition,
+  SpatialHash,
+  SpatialHashTable
+} from "./lib/spatialHashing"
 
 type Entity = {
   transform: Object3D
@@ -22,6 +25,8 @@ type Entity = {
     previousHash?: string
   }
 } & IEntity
+
+const sht: SpatialHashTable<Entity> = new Map()
 
 const ecs = createECS<Entity>()
 
@@ -131,21 +136,6 @@ const tmpvec3 = new Vector3()
 const withVelocity = ecs.world.archetype("velocity", "transform")
 const withFriends = ecs.world.archetype("friends")
 const withSHT = ecs.world.archetype("spatialHashing", "transform")
-
-type Cell = [number, number, number]
-
-function calculateCell({ x, y, z }: Vector3, cellSize = 10): Cell {
-  return [Math.floor(x / cellSize), Math.floor(y / cellSize), Math.floor(z / cellSize)]
-}
-
-function calculateHashForCell(cell: Cell): SpatialHash {
-  /* It's fast :b */
-  return JSON.stringify(cell)
-}
-
-function calculateHashForPosition(position: Vector3, cellSize = 10): SpatialHash {
-  return calculateHashForCell(calculateCell(position, cellSize))
-}
 
 const spatialHashingSystem = () => {
   for (const entity of withSHT.entities) {
