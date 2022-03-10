@@ -63,7 +63,7 @@ const Swarm = ({ count = 100 }) => {
 
   return (
     <>
-      <Boid.Root material={hull.material} geometry={hull.geometry} />
+      <Boid.Root material={hull.material} geometry={hull.geometry}></Boid.Root>
 
       <ecs.Collection tag="boid" initial={count} memoize>
         {(entity) => <BoidEntity entity={entity} />}
