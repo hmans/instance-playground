@@ -174,18 +174,21 @@ const velocitySystem = system(
   }
 )
 
-const avoidEdgeSystem = (dt: number, factor = 1) => {
-  for (const { transform, velocity } of withVelocity.entities) {
-    if (transform.position.length() > 100) {
-      velocity.add(
-        tmpvec3
-          .copy(transform.position)
-          .divideScalar(-100)
-          .multiplyScalar(dt * factor)
-      )
+const avoidEdgeSystem = system(
+  ecs.world.archetype("transform"),
+  (entities, dt: number, factor = 1) => {
+    for (const { transform, velocity } of entities) {
+      if (transform.position.length() > 100) {
+        velocity.add(
+          tmpvec3
+            .copy(transform.position)
+            .divideScalar(-100)
+            .multiplyScalar(dt * factor)
+        )
+      }
     }
   }
-}
+)
 
 /*
 This system will go through all entities and identify its "friends", friends being other
