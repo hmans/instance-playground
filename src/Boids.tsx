@@ -196,6 +196,7 @@ const findFriendsSystem = (radius = 30) => {
   for (const entity of withFriends.entities) {
     const [x, y, z] = calculateCell(entity.transform.position)
 
+    /* Use the Spatial Hash Table to assemble a list of potential candidates who might be friends of us. */
     const candidates = []
 
     for (let ix = x - 1; ix < x + 1; ix++) {
@@ -207,12 +208,10 @@ const findFriendsSystem = (radius = 30) => {
       }
     }
 
-    entity.friends.length = 0
-    for (const other of candidates) {
-      if (entity.transform.position.distanceTo(other.transform.position) < radius) {
-        entity.friends.push(other)
-      }
-    }
+    /* Now go through these candidates and check their distance to us. */
+    entity.friends = candidates.filter(
+      (other) => entity.transform.position.distanceTo(other.transform.position) < radius
+    )
   }
 }
 
