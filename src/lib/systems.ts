@@ -19,6 +19,6 @@ export const batchedSystem = <TEntity extends IEntity = IEntity, TArgs extends a
   return (...args: TArgs) => {
     const batch = entities.slice(offset, offset + batchSize)
     fun(batch, ...args)
-    offset = (offset + batch.length) % entities.length
+    offset = (offset + batch.length) % (entities.length || 1)
   }
 }
