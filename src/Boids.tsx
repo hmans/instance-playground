@@ -67,7 +67,7 @@ export const Boids: FC = () => {
 const Systems = () => {
   const config = useControls({
     friendRadius: {
-      value: 30,
+      value: 10,
       min: 0,
       max: 100,
       step: 1
@@ -188,14 +188,27 @@ other systems to calculate avoidance/separation/cohesion forces.
 */
 const findFriendsSystem = (radius = 30) => {
   for (const entity of withFriends.entities) {
-    const [x, y, z] = calculateCell(entity.transform.position)
+    const { position } = entity.transform
+
+    /* Find the two corners we're interested in */
+    const [ax, ay, az] = calculateCell({
+      x: position.x - radius,
+      y: position.y - radius,
+      z: position.z - radius
+    })
+
+    const [bx, by, bz] = calculateCell({
+      x: position.x + radius,
+      y: position.y + radius,
+      z: position.z + radius
+    })
 
     /* Use the Spatial Hash Table to assemble a list of potential candidates who might be friends of us. */
     const candidates = []
 
-    for (let ix = x - 1; ix < x + 1; ix++) {
-      for (let iy = y - 1; iy < y + 1; iy++) {
-        for (let iz = z - 1; iz < z + 1; iz++) {
+    for (let ix = ax; ix <= bx; ix++) {
+      for (let iy = ay; iy <= by; iy++) {
+        for (let iz = az; iz <= bz; iz++) {
           const hash = calculateHashForCell([ix, iy, iz])
           candidates.push(...(sht.get(hash) || []))
         }
