@@ -192,6 +192,11 @@ const avoidEdgeSystem = (dt: number, factor = 1) => {
   }
 }
 
+/*
+This system will go through all entities and identify its "friends", friends being other
+boid entities that are within a specific radius to it. This list of friends is used by
+other systems to calculate avoidance/separation/cohesion forces.
+*/
 const findFriendsSystem = (radius = 30) => {
   for (const entity of withFriends.entities) {
     const [x, y, z] = calculateCell(entity.transform.position)
@@ -210,29 +215,40 @@ const findFriendsSystem = (radius = 30) => {
 
     /* Now go through these candidates and check their distance to us. */
     entity.friends = candidates.filter(
-      (other) => entity.transform.position.distanceTo(other.transform.position) < radius
+      (other) =>
+        entity !== other &&
+        entity.transform.position.distanceTo(other.transform.position) < radius
     )
   }
 }
 
+/*
+This system goes through each entity's friends and calculates the alignment force
+to match up the entity's velocity with its friends' average velocity.
+*/
 const alignmentSystem = (dt: number, factor = 1) => {
   for (const { friends, velocity } of withFriends.entities) {
     velocity.add(
       friends
         .reduce((acc, friend) => acc.add(friend.velocity), tmpvec3.setScalar(0))
-        .divideScalar(withFriends.entities.length || 1)
+        .divideScalar(friends.length || 1)
         .normalize()
         .multiplyScalar(dt * factor)
     )
   }
 }
 
+/*
+This system goes through each entity's friends and calculates the cohesion force
+to move the entity closer to its friends by calculating the center point of their
+positions and accelerating the entity towards that.
+*/
 const cohesionSystem = (dt: number, factor = 1) => {
   for (const { friends, velocity, transform } of withFriends.entities) {
     velocity.add(
       friends
         .reduce((acc, friend) => acc.add(friend.transform.position), tmpvec3.setScalar(0))
-        .divideScalar(withFriends.entities.length || 1)
+        .divideScalar(friends.length || 1)
         .sub(transform.position)
         .normalize()
         .multiplyScalar(dt * factor)
@@ -248,7 +264,7 @@ const separationSystem = (dt: number, factor = 1) => {
           (acc, friend) => acc.add(friend.transform.position).sub(transform.position),
           tmpvec3.setScalar(0)
         )
-        .divideScalar(withFriends.entities.length || 1)
+        .divideScalar(friends.length || 1)
         .normalize()
         .multiplyScalar(dt * -factor)
     )
