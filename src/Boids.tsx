@@ -5,7 +5,7 @@ import { IEntity, Tag } from "miniplex"
 import { createECS } from "miniplex/react"
 import { between, insideSphere } from "randomish"
 import { FC, Suspense } from "react"
-import { Group, Object3D, Vector3 } from "three"
+import { Group, Object3D, Quaternion, Vector3 } from "three"
 import { makeInstanceComponents } from "./lib/Instances"
 import {
   calculateCell,
@@ -141,6 +141,7 @@ const initializeBoidTransform = (entity: Entity, o3d: Object3D | null) => {
 }
 
 const tmpvec3 = new Vector3()
+const tmpquat = new Quaternion()
 
 /*
 This job goes through all entities that have a transform and a spatialHashing
@@ -188,7 +189,10 @@ const velocitySystem = system(
       transform.position.add(tmpvec3.copy(velocity).multiplyScalar(dt))
 
       /* Rotate entity in the direction of velocity */
-      transform.quaternion.setFromUnitVectors(new Vector3(0, 1, 0), tmpvec3.normalize())
+      transform.quaternion.slerp(
+        tmpquat.setFromUnitVectors(new Vector3(0, 1, 0), tmpvec3.normalize()),
+        0.01
+      )
     }
   }
 )
