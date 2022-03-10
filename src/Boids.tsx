@@ -60,7 +60,7 @@ const Swarm = ({ count = 100 }) => {
 
       <ecs.Collection tag="boid" initial={count}>
         {(entity) => (
-          <Boid.Instance ref={(group) => initializeBoidTransform(entity, group)}>
+          <Boid.Instance ref={(o3d) => initializeBoidTransform(entity, o3d)}>
             <ecs.Component
               name="velocity"
               data={new Vector3().randomDirection().multiplyScalar(between(2, 10))}
@@ -130,13 +130,13 @@ const Systems = () => {
   return null
 }
 
-const initializeBoidTransform = (entity: Entity, group: Group | null) => {
-  if (!group) {
+const initializeBoidTransform = (entity: Entity, o3d: Object3D | null) => {
+  if (!o3d) {
     ecs.world.removeComponent(entity, "transform")
   } else {
-    ecs.world.addComponent(entity, "transform", group)
+    ecs.world.addComponent(entity, "transform", o3d)
 
-    group.position.copy(insideSphere(100) as Vector3)
+    o3d.position.copy(insideSphere(100) as Vector3)
   }
 }
 
