@@ -14,7 +14,7 @@ import {
   SpatialHash,
   SpatialHashTable
 } from "./lib/spatialHashing"
-import { system } from "./lib/systems"
+import { batchedSystem, system } from "./lib/systems"
 
 type Entity = {
   transform: Object3D
@@ -205,8 +205,9 @@ This system will go through all entities and identify its "friends", friends bei
 boid entities that are within a specific radius to it. This list of friends is used by
 other systems to calculate avoidance/separation/cohesion forces.
 */
-const findFriendsSystem = system(
+const findFriendsSystem = batchedSystem(
   ecs.world.archetype("friends", "transform"),
+  100,
   (entities, radius = 30, limit = 50) => {
     for (const entity of entities) {
       const { position } = entity.transform
