@@ -210,15 +210,14 @@ the scene.
 */
 const avoidEdgeSystem = system(
   ecs.world.archetype("transform"),
-  (entities, dt: number, factor = 1) => {
+  (entities, dt: number, factor = 1, maxRadius = 100) => {
     for (const { transform, velocity } of entities) {
-      if (transform.position.length() > 100) {
-        velocity.add(
-          tmpvec3
-            .copy(transform.position)
-            .divideScalar(-100)
-            .multiplyScalar(dt * factor)
-        )
+      if (transform.position.length() > maxRadius) {
+        const acceleration = tmpvec3
+          .copy(transform.position)
+          .multiplyScalar((dt * factor) / -100)
+
+        velocity.add(acceleration)
       }
     }
   }
@@ -233,6 +232,8 @@ const findFriendsSystem = batchedSystem(
   ecs.world.archetype("friends", "transform"),
   100,
   (entities, radius = 30, limit = 50) => {
+    const radiusSquared = radius ** 2
+
     for (const entity of entities) {
       const { position } = entity.transform
 
@@ -268,7 +269,7 @@ const findFriendsSystem = batchedSystem(
       entity.friends = candidates.filter(
         (other) =>
           entity !== other &&
-          entity.transform.position.distanceTo(other.transform.position) < radius
+          entity.transform.position.distanceToSquared(other.transform.position) < radiusSquared
       )
     }
   }
@@ -282,13 +283,15 @@ const alignmentSystem = system(
   ecs.world.archetype("friends", "velocity"),
   (entities, dt: number, factor = 1) => {
     for (const { friends, velocity } of entities) {
-      velocity.add(
-        friends
-          .reduce((acc, friend) => acc.add(friend.velocity), tmpvec3.setScalar(0))
-          .divideScalar(friends.length || 1)
-          .normalize()
-          .multiplyScalar(dt * factor)
-      )
+      if (!friends.length) continue
+
+      const acceleration = friends
+        .reduce((acc, friend) => acc.add(friend.velocity), tmpvec3.setScalar(0))
+        .divideScalar(friends.length || 1)
+        .normalize()
+        .multiplyScalar(dt * factor)
+
+      velocity.add(acceleration)
     }
   }
 )
@@ -302,14 +305,16 @@ const cohesionSystem = system(
   ecs.world.archetype("friends", "velocity", "transform"),
   (entities, dt: number, factor = 1) => {
     for (const { friends, velocity, transform } of entities) {
-      velocity.add(
-        friends
-          .reduce((acc, friend) => acc.add(friend.transform.position), tmpvec3.setScalar(0))
-          .divideScalar(friends.length || 1)
-          .sub(transform.position)
-          .normalize()
-          .multiplyScalar(dt * factor)
-      )
+      if (!friends.length) continue
+
+      const acceleration = friends
+        .reduce((acc, friend) => acc.add(friend.transform.position), tmpvec3.setScalar(0))
+        .divideScalar(friends.length || 1)
+        .sub(transform.position)
+        .normalize()
+        .multiplyScalar(dt * factor)
+
+      velocity.add(acceleration)
     }
   }
 )
@@ -324,16 +329,18 @@ const separationSystem = system(
   ecs.world.archetype("friends", "velocity", "transform"),
   (entities, dt: number, factor = 1) => {
     for (const { friends, velocity, transform } of entities) {
-      velocity.add(
-        friends
-          .reduce(
-            (acc, friend) => acc.add(friend.transform.position).sub(transform.position),
-            tmpvec3.setScalar(0)
-          )
-          .divideScalar(friends.length || 1)
-          .normalize()
-          .multiplyScalar(dt * -factor)
-      )
+      if (!friends.length) continue
+
+      const acceleration = friends
+        .reduce(
+          (acc, friend) => acc.add(friend.transform.position).sub(transform.position),
+          tmpvec3.setScalar(0)
+        )
+        .divideScalar(friends.length || 1)
+        .normalize()
+        .multiplyScalar(dt * -factor)
+
+      velocity.add(acceleration)
     }
   }
 )
