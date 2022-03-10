@@ -186,7 +186,7 @@ This system will go through all entities and identify its "friends", friends bei
 boid entities that are within a specific radius to it. This list of friends is used by
 other systems to calculate avoidance/separation/cohesion forces.
 */
-const findFriendsSystem = (radius = 30) => {
+const findFriendsSystem = (radius = 30, limit = 50) => {
   for (const entity of withFriends.entities) {
     const { position } = entity.transform
 
@@ -210,7 +210,10 @@ const findFriendsSystem = (radius = 30) => {
       for (let iy = ay; iy <= by; iy++) {
         for (let iz = az; iz <= bz; iz++) {
           const hash = calculateHashForCell([ix, iy, iz])
-          candidates.push(...(sht.get(hash) || []))
+
+          if (candidates.length < limit) {
+            candidates.push(...(sht.get(hash) || []))
+          }
         }
       }
     }
