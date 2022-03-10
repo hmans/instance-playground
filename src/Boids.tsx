@@ -34,9 +34,6 @@ const ecs = createECS<Entity>()
 const Boid = makeInstanceComponents()
 
 export const Boids: FC = () => {
-  const gltf = useGLTF("/models/spaceship25.gltf")
-  const hull = gltf.nodes.Hull as any
-
   return (
     <>
       <ambientLight intensity={0.2} />
@@ -46,9 +43,20 @@ export const Boids: FC = () => {
       <PerspectiveCamera position={[0, 0, 200]} makeDefault />
       <Systems />
 
+      <Swarm />
+    </>
+  )
+}
+
+const Swarm = ({ count = 5000 }) => {
+  const gltf = useGLTF("/models/spaceship25.gltf")
+  const hull = gltf.nodes.Hull as any
+
+  return (
+    <>
       <Boid.Root material={hull.material} geometry={hull.geometry} />
 
-      <ecs.Collection tag="boid" initial={5000}>
+      <ecs.Collection tag="boid" initial={count}>
         {(entity) => (
           <group ref={(group) => initializeBoidTransform(entity, group!)}>
             <ecs.Component
