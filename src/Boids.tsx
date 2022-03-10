@@ -134,6 +134,10 @@ const initializeBoidTransform = (entity: Entity, group: Group) => {
 
 const tmpvec3 = new Vector3()
 
+/*
+This job goes through all entities that have a transform and a spatialHashing
+component and updates the spatial hash table according to their position.
+*/
 const spatialHashingSystem = system(
   ecs.world.archetype("spatialHashing", "transform"),
   (entities) => {
@@ -161,6 +165,10 @@ const spatialHashingSystem = system(
   }
 )
 
+/*
+For entities that have a velocity, this system will apply the velocity (by adding it to
+the entity's position), and also clamp it to not be higher than the specified limit.
+*/
 const velocitySystem = system(
   ecs.world.archetype("velocity", "transform"),
   (entities, dt: number, limit: number = 10) => {
@@ -171,6 +179,11 @@ const velocitySystem = system(
   }
 )
 
+/*
+This system goes through all entities and checks if they've gone past the boundaries
+of the scene. If they have, it will apply an acceleration to help them move back into
+the scene.
+*/
 const avoidEdgeSystem = system(
   ecs.world.archetype("transform"),
   (entities, dt: number, factor = 1) => {
