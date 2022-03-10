@@ -45,7 +45,7 @@ export const Boids = () => (
     {/* We're calling all our ECS systems from a <Systems /> component, for convenience. */}
     <Systems />
 
-    {/* A swarm! */}
+    {/* Our swarm! */}
     <Swarm count={5000} />
   </>
 )
@@ -60,16 +60,14 @@ const Swarm = ({ count = 100 }) => {
 
       <ecs.Collection tag="boid" initial={count}>
         {(entity) => (
-          <group ref={(group) => initializeBoidTransform(entity, group!)}>
+          <Boid.Instance ref={(group) => initializeBoidTransform(entity, group)}>
             <ecs.Component
               name="velocity"
               data={new Vector3().randomDirection().multiplyScalar(between(2, 10))}
             />
             <ecs.Component name="friends" data={[]} />
             <ecs.Component name="spatialHashing" data={{ sht }} />
-
-            <Boid.Instance scale={0.2} />
-          </group>
+          </Boid.Instance>
         )}
       </ecs.Collection>
     </>
@@ -132,14 +130,13 @@ const Systems = () => {
   return null
 }
 
-const initializeBoidTransform = (entity: Entity, group: Group) => {
+const initializeBoidTransform = (entity: Entity, group: Group | null) => {
   if (!group) {
     ecs.world.removeComponent(entity, "transform")
   } else {
     ecs.world.addComponent(entity, "transform", group)
 
     group.position.copy(insideSphere(100) as Vector3)
-    group.scale.setScalar(1 + Math.pow(Math.random(), 4) * 3)
   }
 }
 
