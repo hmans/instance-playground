@@ -14,7 +14,7 @@ import {
   SpatialHash,
   SpatialHashTable
 } from "./lib/spatialHashing"
-import { system } from "./lib/systems"
+import { system, system2 } from "./lib/systems"
 
 type Entity = {
   transform: Object3D
@@ -164,12 +164,15 @@ const spatialHashingSystem = system(
   }
 )
 
-const velocitySystem = (dt: number, limit = 10) => {
-  for (const { velocity, transform } of withVelocity.entities) {
-    velocity.clampLength(0, limit)
-    transform.position.add(tmpvec3.copy(velocity).multiplyScalar(dt))
+const velocitySystem = system(
+  ecs.world.archetype("velocity", "transform"),
+  (entities, dt: number, limit: number = 10) => {
+    for (const { velocity, transform } of entities) {
+      velocity.clampLength(0, limit)
+      transform.position.add(tmpvec3.copy(velocity).multiplyScalar(dt))
+    }
   }
-}
+)
 
 const avoidEdgeSystem = (dt: number, factor = 1) => {
   for (const { transform, velocity } of withVelocity.entities) {
