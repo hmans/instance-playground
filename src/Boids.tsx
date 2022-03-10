@@ -8,11 +8,19 @@ import { FC } from "react"
 import { Group, Object3D, Vector3 } from "three"
 import { makeInstanceComponents } from "./lib/Instances"
 
+type SpatialHash = string
+
+const sht: Map<SpatialHash, Entity[]> = new Map()
+
 type Entity = {
   transform: Object3D
   boid: Tag
   friends: Entity[]
   velocity: Vector3
+  spatialHashing: {
+    sht: Map<SpatialHash, Entity[]>
+    previousHash?: string
+  }
 } & IEntity
 
 const ecs = createECS<Entity>()
@@ -41,6 +49,7 @@ export const Boids: FC = () => {
               data={new Vector3().randomDirection().multiplyScalar(between(2, 10))}
             />
             <ecs.Component name="friends" data={[]} />
+            <ecs.Component name="spatialHashing" data={{ sht }} />
 
             <Boid.Instance />
           </group>
@@ -92,6 +101,7 @@ const Systems = () => {
 
   useFrame((_, dt) => {
     /* Boids */
+    spatialHashingSystem()
     findFriendsSystem(config.friendRadius)
     alignmentSystem(dt, config.alignmentFactor)
     cohesionSystem(dt, config.cohesionFactor)
@@ -121,6 +131,46 @@ const tmpvec3 = new Vector3()
 const withVelocity = ecs.world.archetype("velocity", "transform")
 const withFriends = ecs.world.archetype("friends")
 const withBoid = ecs.world.archetype("boid")
+const withSHT = ecs.world.archetype("spatialHashing", "transform")
+
+type Cell = [number, number, number]
+
+function calculateCell({ x, y, z }: Vector3, cellSize = 10): Cell {
+  return [Math.floor(x / cellSize), Math.floor(y / cellSize), Math.floor(z / cellSize)]
+}
+
+function calculateHashForCell(cell: Cell) {
+  /* It's fast :b */
+  return JSON.stringify(cell)
+}
+
+function calculateSpatialHash(position: Vector3, cellSize = 10): SpatialHash {
+  return calculateHashForCell(calculateCell(position, cellSize))
+}
+
+const spatialHashingSystem = () => {
+  for (const entity of withSHT.entities) {
+    const hash = calculateSpatialHash(entity.transform.position)
+
+    if (entity.spatialHashing.previousHash !== hash) {
+      const { sht } = entity.spatialHashing
+
+      /* Remove entity from previous hash */
+      if (entity.spatialHashing.previousHash) {
+        const previousList = sht.get(entity.spatialHashing.previousHash)!
+        const pos = previousList.indexOf(entity, 0)
+        previousList.splice(pos, 1)
+      }
+
+      /* Add entity to sht */
+      if (!sht.has(hash)) sht.set(hash, [])
+      sht.get(hash)?.push(entity)
+
+      /* Remember new hash */
+      entity.spatialHashing.previousHash = hash
+    }
+  }
+}
 
 const velocitySystem = (dt: number, limit = 10) => {
   for (const { velocity, transform } of withVelocity.entities) {
@@ -144,12 +194,21 @@ const avoidEdgeSystem = (dt: number, factor = 1) => {
 
 const findFriendsSystem = (radius = 30) => {
   for (const entity of withFriends.entities) {
-    /* The way we're finding friends is very expensive, so as a stupid little performance hack,
-       let's only do it 5% of the time. */
-    if (chance(0.95)) continue
+    const [x, y, z] = calculateCell(entity.transform.position)
 
-    entity.friends = []
-    for (const other of withBoid.entities) {
+    const candidates = []
+
+    for (let ix = x - 1; ix < x + 1; ix++) {
+      for (let iy = y - 1; iy < y + 1; iy++) {
+        for (let iz = z - 1; iz < z + 1; iz++) {
+          const hash = calculateHashForCell([ix, iy, iz])
+          candidates.push(...(sht.get(hash) || []))
+        }
+      }
+    }
+
+    entity.friends.length = 0
+    for (const other of candidates) {
       if (entity.transform.position.distanceTo(other.transform.position) < radius) {
         entity.friends.push(other)
       }
