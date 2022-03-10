@@ -5,7 +5,7 @@ type IVector3 = { x: number; y: number; z: number }
 
 type Cell = [number, number, number]
 
-export function calculateCell({ x, y, z }: IVector3, cellSize = 10): Cell {
+export function calculateCell({ x, y, z }: IVector3, cellSize = 30): Cell {
   return [Math.floor(x / cellSize), Math.floor(y / cellSize), Math.floor(z / cellSize)]
 }
 
