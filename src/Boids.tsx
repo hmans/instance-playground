@@ -134,9 +134,6 @@ const initializeBoidTransform = (entity: Entity, group: Group) => {
 
 const tmpvec3 = new Vector3()
 
-const withVelocity = ecs.world.archetype("velocity", "transform")
-const withFriends = ecs.world.archetype("friends")
-
 const spatialHashingSystem = system(
   ecs.world.archetype("spatialHashing", "transform"),
   (entities) => {
@@ -243,35 +240,41 @@ const findFriendsSystem = system(
 This system goes through each entity's friends and calculates the alignment force
 to match up the entity's velocity with its friends' average velocity.
 */
-const alignmentSystem = (dt: number, factor = 1) => {
-  for (const { friends, velocity } of withFriends.entities) {
-    velocity.add(
-      friends
-        .reduce((acc, friend) => acc.add(friend.velocity), tmpvec3.setScalar(0))
-        .divideScalar(friends.length || 1)
-        .normalize()
-        .multiplyScalar(dt * factor)
-    )
+const alignmentSystem = system(
+  ecs.world.archetype("friends", "velocity"),
+  (entities, dt: number, factor = 1) => {
+    for (const { friends, velocity } of entities) {
+      velocity.add(
+        friends
+          .reduce((acc, friend) => acc.add(friend.velocity), tmpvec3.setScalar(0))
+          .divideScalar(friends.length || 1)
+          .normalize()
+          .multiplyScalar(dt * factor)
+      )
+    }
   }
-}
+)
 
 /*
 This system goes through each entity's friends and calculates the cohesion force
 to move the entity closer to its friends by calculating the center point of their
 positions and accelerating the entity towards that.
 */
-const cohesionSystem = (dt: number, factor = 1) => {
-  for (const { friends, velocity, transform } of withFriends.entities) {
-    velocity.add(
-      friends
-        .reduce((acc, friend) => acc.add(friend.transform.position), tmpvec3.setScalar(0))
-        .divideScalar(friends.length || 1)
-        .sub(transform.position)
-        .normalize()
-        .multiplyScalar(dt * factor)
-    )
+const cohesionSystem = system(
+  ecs.world.archetype("friends", "velocity", "transform"),
+  (entities, dt: number, factor = 1) => {
+    for (const { friends, velocity, transform } of entities) {
+      velocity.add(
+        friends
+          .reduce((acc, friend) => acc.add(friend.transform.position), tmpvec3.setScalar(0))
+          .divideScalar(friends.length || 1)
+          .sub(transform.position)
+          .normalize()
+          .multiplyScalar(dt * factor)
+      )
+    }
   }
-}
+)
 
 /*
 This system goes through each entity's friends and calculates the separation force
@@ -279,17 +282,20 @@ to move the entity _away_ from its friends in order to avoid collisions. It does
 this by calculating the average distance to each friend and then inverting that
 vector before it is applied as a force.
 */
-const separationSystem = (dt: number, factor = 1) => {
-  for (const { friends, velocity, transform } of withFriends.entities) {
-    velocity.add(
-      friends
-        .reduce(
-          (acc, friend) => acc.add(friend.transform.position).sub(transform.position),
-          tmpvec3.setScalar(0)
-        )
-        .divideScalar(friends.length || 1)
-        .normalize()
-        .multiplyScalar(dt * -factor)
-    )
+const separationSystem = system(
+  ecs.world.archetype("friends", "velocity", "transform"),
+  (entities, dt: number, factor = 1) => {
+    for (const { friends, velocity, transform } of entities) {
+      velocity.add(
+        friends
+          .reduce(
+            (acc, friend) => acc.add(friend.transform.position).sub(transform.position),
+            tmpvec3.setScalar(0)
+          )
+          .divideScalar(friends.length || 1)
+          .normalize()
+          .multiplyScalar(dt * -factor)
+      )
+    }
   }
-}
+)
