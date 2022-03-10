@@ -14,6 +14,7 @@ import {
   SpatialHash,
   SpatialHashTable
 } from "./lib/spatialHashing"
+import { system } from "./lib/systems"
 
 type Entity = {
   transform: Object3D
@@ -135,31 +136,33 @@ const tmpvec3 = new Vector3()
 
 const withVelocity = ecs.world.archetype("velocity", "transform")
 const withFriends = ecs.world.archetype("friends")
-const withSHT = ecs.world.archetype("spatialHashing", "transform")
 
-const spatialHashingSystem = () => {
-  for (const entity of withSHT.entities) {
-    const hash = calculateHashForPosition(entity.transform.position)
+const spatialHashingSystem = system(
+  ecs.world.archetype("spatialHashing", "transform"),
+  (entities) => {
+    for (const entity of entities) {
+      const hash = calculateHashForPosition(entity.transform.position)
 
-    if (entity.spatialHashing.previousHash !== hash) {
-      const { sht } = entity.spatialHashing
+      if (entity.spatialHashing.previousHash !== hash) {
+        const { sht } = entity.spatialHashing
 
-      /* Remove entity from previous hash */
-      if (entity.spatialHashing.previousHash) {
-        const previousList = sht.get(entity.spatialHashing.previousHash)!
-        const pos = previousList.indexOf(entity, 0)
-        previousList.splice(pos, 1)
+        /* Remove entity from previous hash */
+        if (entity.spatialHashing.previousHash) {
+          const previousList = sht.get(entity.spatialHashing.previousHash)!
+          const pos = previousList.indexOf(entity, 0)
+          previousList.splice(pos, 1)
+        }
+
+        /* Add entity to sht */
+        if (!sht.has(hash)) sht.set(hash, [])
+        sht.get(hash)?.push(entity)
+
+        /* Remember new hash */
+        entity.spatialHashing.previousHash = hash
       }
-
-      /* Add entity to sht */
-      if (!sht.has(hash)) sht.set(hash, [])
-      sht.get(hash)?.push(entity)
-
-      /* Remember new hash */
-      entity.spatialHashing.previousHash = hash
     }
   }
-}
+)
 
 const velocitySystem = (dt: number, limit = 10) => {
   for (const { velocity, transform } of withVelocity.entities) {
