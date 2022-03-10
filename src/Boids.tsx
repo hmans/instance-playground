@@ -4,8 +4,7 @@ import { useControls } from "leva"
 import { IEntity, Tag } from "miniplex"
 import { createECS } from "miniplex/react"
 import { between, insideSphere } from "randomish"
-import { FC, Suspense } from "react"
-import { Group, Object3D, Quaternion, Vector3 } from "three"
+import { Object3D, Quaternion, Vector3 } from "three"
 import { makeInstanceComponents } from "./lib/Instances"
 import {
   calculateCell,
