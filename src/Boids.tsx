@@ -33,22 +33,24 @@ const ecs = createECS<Entity>()
 
 const Boid = makeInstanceComponents()
 
-export const Boids: FC = () => {
-  return (
-    <>
-      <ambientLight intensity={0.2} />
-      <directionalLight position={[10, 10, 10]} intensity={0.4} />
-      <color attach="background" args={["#111"]} />
-      <fog attach="fog" args={["#111", 64, 512]} />
-      <PerspectiveCamera position={[0, 0, 200]} makeDefault />
-      <Systems />
+export const Boids = () => (
+  <>
+    {/* Just a bunch of normal r3f stuff. */}
+    <ambientLight intensity={0.2} />
+    <directionalLight position={[10, 10, 10]} intensity={0.4} />
+    <color attach="background" args={["#111"]} />
+    <fog attach="fog" args={["#111", 64, 512]} />
+    <PerspectiveCamera position={[0, 0, 200]} makeDefault />
 
-      <Swarm />
-    </>
-  )
-}
+    {/* We're calling all our ECS systems from a <Systems /> component, for convenience. */}
+    <Systems />
 
-const Swarm = ({ count = 5000 }) => {
+    {/* A swarm! */}
+    <Swarm count={5000} />
+  </>
+)
+
+const Swarm = ({ count = 100 }) => {
   const gltf = useGLTF("/models/spaceship25.gltf")
   const hull = gltf.nodes.Hull as any
 
