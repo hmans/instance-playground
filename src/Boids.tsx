@@ -130,7 +130,6 @@ const tmpvec3 = new Vector3()
 
 const withVelocity = ecs.world.archetype("velocity", "transform")
 const withFriends = ecs.world.archetype("friends")
-const withBoid = ecs.world.archetype("boid")
 const withSHT = ecs.world.archetype("spatialHashing", "transform")
 
 type Cell = [number, number, number]
@@ -139,18 +138,18 @@ function calculateCell({ x, y, z }: Vector3, cellSize = 10): Cell {
   return [Math.floor(x / cellSize), Math.floor(y / cellSize), Math.floor(z / cellSize)]
 }
 
-function calculateHashForCell(cell: Cell) {
+function calculateHashForCell(cell: Cell): SpatialHash {
   /* It's fast :b */
   return JSON.stringify(cell)
 }
 
-function calculateSpatialHash(position: Vector3, cellSize = 10): SpatialHash {
+function calculateHashForPosition(position: Vector3, cellSize = 10): SpatialHash {
   return calculateHashForCell(calculateCell(position, cellSize))
 }
 
 const spatialHashingSystem = () => {
   for (const entity of withSHT.entities) {
-    const hash = calculateSpatialHash(entity.transform.position)
+    const hash = calculateHashForPosition(entity.transform.position)
 
     if (entity.spatialHashing.previousHash !== hash) {
       const { sht } = entity.spatialHashing
@@ -256,6 +255,12 @@ const cohesionSystem = (dt: number, factor = 1) => {
   }
 }
 
+/*
+This system goes through each entity's friends and calculates the separation force
+to move the entity _away_ from its friends in order to avoid collisions. It does
+this by calculating the average distance to each friend and then inverting that
+vector before it is applied as a force.
+*/
 const separationSystem = (dt: number, factor = 1) => {
   for (const { friends, velocity, transform } of withFriends.entities) {
     velocity.add(
