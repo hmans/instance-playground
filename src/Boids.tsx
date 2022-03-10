@@ -195,46 +195,49 @@ This system will go through all entities and identify its "friends", friends bei
 boid entities that are within a specific radius to it. This list of friends is used by
 other systems to calculate avoidance/separation/cohesion forces.
 */
-const findFriendsSystem = (radius = 30, limit = 50) => {
-  for (const entity of withFriends.entities) {
-    const { position } = entity.transform
+const findFriendsSystem = system(
+  ecs.world.archetype("friends", "transform"),
+  (entities, radius = 30, limit = 50) => {
+    for (const entity of entities) {
+      const { position } = entity.transform
 
-    /* Find the two corners we're interested in */
-    const [ax, ay, az] = calculateCell({
-      x: position.x - radius,
-      y: position.y - radius,
-      z: position.z - radius
-    })
+      /* Find the two corners we're interested in */
+      const [ax, ay, az] = calculateCell({
+        x: position.x - radius,
+        y: position.y - radius,
+        z: position.z - radius
+      })
 
-    const [bx, by, bz] = calculateCell({
-      x: position.x + radius,
-      y: position.y + radius,
-      z: position.z + radius
-    })
+      const [bx, by, bz] = calculateCell({
+        x: position.x + radius,
+        y: position.y + radius,
+        z: position.z + radius
+      })
 
-    /* Use the Spatial Hash Table to assemble a list of potential candidates who might be friends of us. */
-    const candidates = []
+      /* Use the Spatial Hash Table to assemble a list of potential candidates who might be friends of us. */
+      const candidates = []
 
-    for (let ix = ax; ix <= bx; ix++) {
-      for (let iy = ay; iy <= by; iy++) {
-        for (let iz = az; iz <= bz; iz++) {
-          const hash = calculateHashForCell([ix, iy, iz])
+      for (let ix = ax; ix <= bx; ix++) {
+        for (let iy = ay; iy <= by; iy++) {
+          for (let iz = az; iz <= bz; iz++) {
+            const hash = calculateHashForCell([ix, iy, iz])
 
-          if (candidates.length < limit) {
-            candidates.push(...(sht.get(hash) || []))
+            if (candidates.length < limit) {
+              candidates.push(...(sht.get(hash) || []))
+            }
           }
         }
       }
-    }
 
-    /* Now go through these candidates and check their distance to us. */
-    entity.friends = candidates.filter(
-      (other) =>
-        entity !== other &&
-        entity.transform.position.distanceTo(other.transform.position) < radius
-    )
+      /* Now go through these candidates and check their distance to us. */
+      entity.friends = candidates.filter(
+        (other) =>
+          entity !== other &&
+          entity.transform.position.distanceTo(other.transform.position) < radius
+      )
+    }
   }
-}
+)
 
 /*
 This system goes through each entity's friends and calculates the alignment force
