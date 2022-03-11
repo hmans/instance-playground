@@ -34,6 +34,10 @@ const playerInputSystem = system(ecs.world.archetype("player"), (entities, thrus
 
   for (const entity of entities) {
     entity.velocity?.add(tmpvec3.set(move.value.x, move.value.y, 0).multiplyScalar(thrust))
+    entity.transform!.quaternion.setFromUnitVectors(
+      new Vector3(0, 1, 0),
+      entity.velocity!.clone().normalize()
+    )
   }
 })
 
@@ -68,7 +72,7 @@ const spawnNewEnemies = () => {
   ecs.world.createEntity({ enemy: Tag })
 }
 
-const spawnNewEnemiesSystem = withInterval(1, spawnNewEnemies)
+const spawnNewEnemiesSystem = withInterval(0.2, spawnNewEnemies)
 
 const findAttractorsForEnemies = system(
   ecs.world.archetype("enemy", "attractors"),
