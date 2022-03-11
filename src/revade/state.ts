@@ -21,6 +21,10 @@ export type RevadeEntity = Partial<{
   autorotate: {
     speed: number
   }
+  autosqueeze: {
+    t: number
+    speed: number
+  }
 }> &
   IEntity
 

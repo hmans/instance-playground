@@ -1,5 +1,5 @@
 import { Dodecahedron } from "@react-three/drei"
-import { between } from "randomish"
+import { between, number } from "randomish"
 import { Quaternion } from "three"
 import { ecs } from "./state"
 

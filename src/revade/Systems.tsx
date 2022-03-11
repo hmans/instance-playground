@@ -21,6 +21,7 @@ export const Systems = () => {
     velocitySystem(dt)
     velocityDapmingSystem()
     autoRotateSystem(dt)
+    autoSqueezeSystem(dt)
 
     spawnNewEnemiesSystem(dt)
   })
@@ -139,6 +140,17 @@ const autoRotateSystem = system(
   (entities, dt: number) => {
     for (const { transform, autorotate } of entities) {
       transform!.rotation.x = transform!.rotation.y += dt * autorotate!.speed
+    }
+  }
+)
+
+const autoSqueezeSystem = system(
+  ecs.world.archetype("transform", "autosqueeze"),
+  (entities, dt: number) => {
+    for (const { transform, autosqueeze } of entities) {
+      autosqueeze!.t += dt * autosqueeze!.speed
+      transform!.scale.x = 1 + Math.cos(autosqueeze!.t) * 0.2
+      transform!.scale.y = 1 + Math.sin(autosqueeze!.t) * 0.2
     }
   }
 )
