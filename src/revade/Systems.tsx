@@ -1,7 +1,7 @@
 import { useFrame } from "@react-three/fiber"
 import { Vector3 } from "three"
 import { system } from "../lib/systems"
-import { devices, stick } from "./controller"
+import { controls, update } from "./controller"
 import { ecs } from "./state"
 
 const tmpvec3 = new Vector3()
@@ -10,10 +10,9 @@ export const Systems = () => {
   useFrame((_, dt) => {
     velocitySystem(dt)
 
-    for (const device of Object.values(devices)) device.update()
-    stick.update()
+    update()
 
-    console.log(stick.value)
+    console.log(controls.stick.value)
   })
 
   return null
