@@ -11,7 +11,7 @@ export const Systems = () => {
     velocitySystem(dt)
 
     controller.update()
-    console.log(controller.controls.stick.value)
+    console.log(controller.controls.fire.value)
   })
 
   return null
