@@ -17,7 +17,7 @@ export class KeyboardDevice extends Device {
 
   update() {}
 
-  isPressed = (key: string) => !!this.keyState[key]
+  isPressed = (key: string) => (this.keyState[key] ? 1 : 0)
 
   handleKeyDown = (event: KeyboardEvent) => {
     this.keyState[event.key] = true
