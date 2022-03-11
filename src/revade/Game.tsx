@@ -1,4 +1,5 @@
 import { PerspectiveCamera } from "@react-three/drei"
+import { Enemies } from "./Enemies"
 import { Player } from "./Player"
 import { Systems } from "./Systems"
 
@@ -15,6 +16,7 @@ export const Game = () => {
       <Systems />
 
       <Player />
+      <Enemies />
     </>
   )
 }
