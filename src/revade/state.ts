@@ -10,6 +10,9 @@ export type RevadeEntity = Partial<{
   /* Components */
   transform: Object3D
   velocity: Vector3
+  velocityLimit: number
+  velocityDamping: number
+  attractors: RevadeEntity[]
 }> &
   IEntity
 

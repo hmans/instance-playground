@@ -13,6 +13,9 @@ export const Player = () => {
       <ecs.Component name="velocity">
         <vector3 />
       </ecs.Component>
+
+      <ecs.Component name="velocityLimit" data={15} />
+      <ecs.Component name="velocityDamping" data={0.9} />
     </ecs.Collection>
   )
 }

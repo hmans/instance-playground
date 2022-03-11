@@ -15,6 +15,10 @@ export const Enemies = () => (
         <ecs.Component name="velocity">
           <vector3 />
         </ecs.Component>
+
+        <ecs.Component name="velocityLimit" data={5} />
+
+        <ecs.Component name="attractors" data={[]} />
       </>
     )}
   </ecs.Collection>
