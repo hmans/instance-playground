@@ -88,7 +88,7 @@ const BoidEntity: FC<{ entity: Entity }> = ({ entity }) => (
 const Systems = () => {
   const config = useControls({
     friendRadius: {
-      value: 15,
+      value: 30,
       min: 0,
       max: 100,
       step: 1
