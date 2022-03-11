@@ -1,10 +1,10 @@
 import { Dodecahedron } from "@react-three/drei"
 import { between } from "randomish"
-import { Quaternion, Vector3 } from "three"
+import { Quaternion } from "three"
 import { ecs } from "./state"
 
 export const Enemies = () => (
-  <ecs.Collection tag="enemy" initial={100} memoize>
+  <ecs.Collection tag="enemy" initial={1} memoize>
     {() => (
       <>
         <ecs.Component name="transform">
@@ -13,7 +13,7 @@ export const Enemies = () => (
             quaternion={new Quaternion().random()}
           >
             <meshStandardMaterial
-              color="hotpink"
+              color="white"
               wireframe
               emissive={"white"}
               emissiveIntensity={1}
