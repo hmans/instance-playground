@@ -1,3 +1,3 @@
-export const Revade = () => {
-  return null
-}
+import { Game } from "./Game"
+
+export const Revade = () => <Game />
