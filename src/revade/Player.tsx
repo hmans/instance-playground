@@ -6,7 +6,7 @@ export const Player = () => {
     <ecs.Collection tag="player" initial={1}>
       <ecs.Component name="transform">
         <Box>
-          <meshStandardMaterial color="red" />
+          <meshStandardMaterial color="orange" />
         </Box>
       </ecs.Component>
 
