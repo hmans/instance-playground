@@ -1,4 +1,4 @@
-import { PerspectiveCamera, useGLTF } from "@react-three/drei"
+import { OrbitControls, PerspectiveCamera, useGLTF } from "@react-three/drei"
 import { useFrame } from "@react-three/fiber"
 import { useControls } from "leva"
 import { IEntity, Tag } from "miniplex"
@@ -50,6 +50,7 @@ export const Boids = () => (
     <color attach="background" args={["#111"]} />
     <fog attach="fog" args={["#111", 64, 512]} />
     <PerspectiveCamera position={[0, 0, 200]} makeDefault />
+    <OrbitControls />
 
     {/* We're calling all our ECS systems from a <Systems /> component, for convenience. */}
     <Systems />
