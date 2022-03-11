@@ -11,7 +11,7 @@ export const Player = () => {
       </ecs.Component>
 
       <ecs.Component name="velocity">
-        <vector3 x={5} />
+        <vector3 />
       </ecs.Component>
     </ecs.Collection>
   )
