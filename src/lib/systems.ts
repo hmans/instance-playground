@@ -22,3 +22,16 @@ export const batchedSystem = <TEntity extends IEntity = IEntity, TArgs extends a
     offset = (offset + batch.length) % (entities.length || 1)
   }
 }
+
+export const withInterval = (interval: number, fun: () => any) => {
+  let cooldown = interval
+
+  return (dt: number) => {
+    cooldown -= dt
+
+    if (cooldown <= 0) {
+      cooldown += interval
+      fun()
+    }
+  }
+}

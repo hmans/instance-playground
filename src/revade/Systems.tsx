@@ -2,15 +2,13 @@ import { VectorControl } from "@hmans/controlfreak"
 import { useFrame } from "@react-three/fiber"
 import { Tag } from "miniplex"
 import { Vector3 } from "three"
-import { system } from "../lib/systems"
+import { system, withInterval } from "../lib/systems"
 import { controller } from "./controller"
 import { ecs } from "./state"
 
 const tmpvec3 = new Vector3()
 
 export const Systems = () => {
-  const spawnSystem = spawnNewEnemiesSystem(1)
-
   useFrame((_, dt) => {
     playerInputSystem(5)
 
@@ -21,7 +19,7 @@ export const Systems = () => {
     velocitySystem(dt)
     velocityDapmingSystem()
 
-    spawnSystem(dt)
+    spawnNewEnemiesSystem(dt)
   })
 
   return null
@@ -63,19 +61,11 @@ const velocitySystem = system(
   }
 )
 
-const spawnNewEnemiesSystem = (delay: number) => {
-  let cooldown = delay
-
-  return (dt: number) => {
-    cooldown -= dt
-    if (cooldown <= 0) {
-      console.log("SPAWN")
-      cooldown += delay
-
-      ecs.world.createEntity({ enemy: Tag })
-    }
-  }
+const spawnNewEnemies = () => {
+  ecs.world.createEntity({ enemy: Tag })
 }
+
+const spawnNewEnemiesSystem = withInterval(1, spawnNewEnemies)
 
 const findAttractorsForEnemies = system(
   ecs.world.archetype("enemy", "attractors"),
