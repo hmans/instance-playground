@@ -20,6 +20,7 @@ export const Systems = () => {
     velocityLimitSystem()
     velocitySystem(dt)
     velocityDapmingSystem()
+    autoRotateSystem(dt)
 
     spawnNewEnemiesSystem(dt)
   })
@@ -125,6 +126,15 @@ const avoidanceSystem = system(
 
         velocity!.add(acceleration)
       }
+    }
+  }
+)
+
+const autoRotateSystem = system(
+  ecs.world.archetype("transform", "autorotate"),
+  (entities, dt: number) => {
+    for (const { transform, autorotate } of entities) {
+      transform!.rotation.x = transform!.rotation.y += dt * autorotate!.speed
     }
   }
 )

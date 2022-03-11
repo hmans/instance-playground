@@ -1,5 +1,6 @@
 import { Dodecahedron } from "@react-three/drei"
 import { between } from "randomish"
+import { Quaternion, Vector3 } from "three"
 import { ecs } from "./state"
 
 export const Enemies = () => (
@@ -7,7 +8,10 @@ export const Enemies = () => (
     {() => (
       <>
         <ecs.Component name="transform">
-          <Dodecahedron position={[between(-50, 50), between(-50, 50), 0]}>
+          <Dodecahedron
+            position={[between(-50, 50), between(-50, 50), 0]}
+            quaternion={new Quaternion().random()}
+          >
             <meshStandardMaterial
               color="hotpink"
               wireframe
@@ -26,6 +30,7 @@ export const Enemies = () => (
           name="avoidance"
           data={{ range: 1, neighbors: [], archetype: ecs.world.archetype("enemy") }}
         />
+        <ecs.Component name="autorotate" data={{ speed: 1 }} />
       </>
     )}
   </ecs.Collection>

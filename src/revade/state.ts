@@ -18,6 +18,9 @@ export type RevadeEntity = Partial<{
     neighbors: RevadeEntity[]
     archetype: Archetype<RevadeEntity>
   }
+  autorotate: {
+    speed: number
+  }
 }> &
   IEntity
 
