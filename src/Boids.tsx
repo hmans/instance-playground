@@ -88,37 +88,37 @@ const BoidEntity: FC<{ entity: Entity }> = ({ entity }) => (
 const Systems = () => {
   const config = useControls({
     friendRadius: {
-      value: 10,
+      value: 15,
       min: 0,
       max: 100,
       step: 1
     },
     alignmentFactor: {
-      value: 1,
+      value: 5,
       min: 0,
       max: 10,
       step: 0.25
     },
     cohesionFactor: {
-      value: 1,
+      value: 7,
       min: 0,
       max: 10,
       step: 0.25
     },
     separationFactor: {
-      value: 1,
+      value: 5,
       min: 0,
       max: 10,
       step: 0.25
     },
     avoidEdgeFactor: {
-      value: 1,
+      value: 3,
       min: 0,
       max: 10,
       step: 0.25
     },
     maxVelocity: {
-      value: 50,
+      value: 15,
       min: 0,
       max: 100,
       step: 1
