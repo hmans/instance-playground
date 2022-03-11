@@ -8,7 +8,12 @@ export const Enemies = () => (
       <>
         <ecs.Component name="transform">
           <Dodecahedron position={[between(-50, 50), between(-50, 50), 0]}>
-            <meshStandardMaterial color="hotpink" />
+            <meshStandardMaterial
+              color="hotpink"
+              wireframe
+              emissive={"white"}
+              emissiveIntensity={1}
+            />
           </Dodecahedron>
         </ecs.Component>
         <ecs.Component name="velocity">
