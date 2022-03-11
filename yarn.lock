@@ -277,6 +277,11 @@
   resolved "https://registry.yarnpkg.com/@chevrotain/utils/-/utils-10.1.2.tgz#d2fb7b968141139e5c2419553e5295382c265e7d"
   integrity sha512-bbZIpW6fdyf7FMaeDmw3cBbkTqsecxEkwlVKgVfqqXWBPLH6azxhPA2V9F7OhoZSVrsnMYw7QuyK6qutXPjEew==
 
+"@hmans/controlfreak@^0.1.1":
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/@hmans/controlfreak/-/controlfreak-0.1.1.tgz#c4e98d8d3dbbd325b29c69ddefd02a7500f0fbe8"
+  integrity sha512-9PaCwzQVVOkvo8lkGiBrsI1RI+rfv+5z62gdL23dAA9ZO8alCiKlSNd702WwXN7+I8lO2kvpV9NhPDDR3dYoEA==
+
 "@jridgewell/resolve-uri@^3.0.3":
   version "3.0.5"
   resolved "https://registry.yarnpkg.com/@jridgewell/resolve-uri/-/resolve-uri-3.0.5.tgz#68eb521368db76d040a6315cdb24bf2483037b9c"

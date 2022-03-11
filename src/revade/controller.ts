@@ -1,4 +1,4 @@
-import { Device, GamepadDevice, KeyboardDevice, VectorControl } from "../lib/controlfreak/"
+import { Device, GamepadDevice, KeyboardDevice, VectorControl } from "@hmans/controlfreak"
 
 export const devices = [new KeyboardDevice().start(), new GamepadDevice().start()]
 
