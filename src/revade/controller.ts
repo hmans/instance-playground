@@ -1,30 +1,28 @@
 import { Device, GamepadDevice, KeyboardDevice, VectorControl } from "../lib/controlfreak/"
 
-export const devices = {
-  keyboard: new KeyboardDevice().start(),
-  gamepad: new GamepadDevice().start()
+export const devices = [new KeyboardDevice().start(), new GamepadDevice().start()]
+
+let activeDevice: Device
+
+for (const device of devices) {
+  device.onActivity.on(() => (activeDevice = device))
 }
-
-let activeDevice: Device = devices.keyboard
-
-devices.keyboard.onActivity.on(() => (activeDevice = devices.keyboard))
-devices.gamepad.onActivity.on(() => (activeDevice = devices.gamepad))
 
 export const stick = new VectorControl()
   .addStep(({ value }) => {
-    if (activeDevice === devices.keyboard) {
-      const { isPressed } = devices.keyboard
+    if (activeDevice instanceof KeyboardDevice) {
+      const { isPressed } = activeDevice
       value.x = isPressed("d") - isPressed("a")
       value.y = isPressed("w") - isPressed("s")
     }
   })
   .addStep(({ value }) => {
-    if (activeDevice === devices.gamepad) {
-      const { gamepad } = devices
+    if (activeDevice instanceof GamepadDevice) {
+      const { device } = activeDevice
 
-      if (gamepad.device) {
-        value.x = gamepad.device.axes[0]
-        value.y = -gamepad.device.axes[1]
+      if (device) {
+        value.x = device.axes[0]
+        value.y = -device.axes[1]
       }
     }
   })
