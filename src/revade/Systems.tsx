@@ -1,3 +1,4 @@
+import { VectorControl } from "@hmans/controlfreak"
 import { useFrame } from "@react-three/fiber"
 import { Vector3 } from "three"
 import { system } from "../lib/systems"
@@ -8,14 +9,21 @@ const tmpvec3 = new Vector3()
 
 export const Systems = () => {
   useFrame((_, dt) => {
+    playerInputSystem()
     velocitySystem(dt)
-
-    controller.update()
-    console.log(controller.controls.fire.value)
   })
 
   return null
 }
+
+const playerInputSystem = system(ecs.world.archetype("player"), (entities) => {
+  controller.update()
+  const move = controller.controls.move as VectorControl
+
+  for (const entity of entities) {
+    entity.velocity?.set(move.value.x * 7, move.value.y * 7, 0)
+  }
+})
 
 const velocitySystem = system(
   ecs.world.archetype("velocity", "transform"),
