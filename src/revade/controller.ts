@@ -13,7 +13,7 @@ const normalizeVector = ({ value }: VectorControl) => {
 }
 
 const compositeKeyboardVector =
-  (controller: Controller, up = "w", down = "s", left = "a", right = "d") =>
+  (controller: Controller, up: string, down: string, left: string, right: string) =>
   ({ value }: VectorControl) => {
     if (controller.activeDevice instanceof KeyboardDevice) {
       const { isPressed } = controller.activeDevice
@@ -39,12 +39,7 @@ class Controller {
   devices: Device[] = [new KeyboardDevice().start(), new GamepadDevice().start()]
   activeDevice: Device = null!
 
-  controls: Record<string, Control> = {
-    stick: new VectorControl()
-      .addStep(compositeKeyboardVector(this))
-      .addStep(gamepadAxisVector(this))
-      .addStep(normalizeVector)
-  }
+  controls: Record<string, Control> = {}
 
   constructor() {
     for (const device of this.devices) {
@@ -59,3 +54,13 @@ class Controller {
 }
 
 export const controller = new Controller()
+
+controller.controls.move = new VectorControl()
+  .addStep(compositeKeyboardVector(controller, "w", "s", "a", "d"))
+  .addStep(gamepadAxisVector(controller, 0, 1))
+  .addStep(normalizeVector)
+
+controller.controls.aim = new VectorControl()
+  .addStep(compositeKeyboardVector(controller, "up", "down", "left", "right"))
+  .addStep(gamepadAxisVector(controller, 2, 3))
+  .addStep(normalizeVector)
