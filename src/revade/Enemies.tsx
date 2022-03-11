@@ -11,14 +11,16 @@ export const Enemies = () => (
             <meshStandardMaterial color="hotpink" />
           </Dodecahedron>
         </ecs.Component>
-
         <ecs.Component name="velocity">
           <vector3 />
         </ecs.Component>
-
         <ecs.Component name="velocityLimit" data={5} />
-
+        <ecs.Component name="velocityDamping" data={0.9} />
         <ecs.Component name="attractors" data={[]} />
+        <ecs.Component
+          name="avoidance"
+          data={{ range: 3, neighbors: [], archetype: ecs.world.archetype("enemy") }}
+        />
       </>
     )}
   </ecs.Collection>

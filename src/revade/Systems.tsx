@@ -15,6 +15,8 @@ export const Systems = () => {
     findAttractorsForEnemies()
     followAttractors()
 
+    avoidanceSystem()
+
     velocityLimitSystem()
     velocitySystem(dt)
     velocityDapmingSystem()
@@ -93,6 +95,34 @@ const followAttractors = system(
           .divideScalar(attractors!.length)
 
         velocity?.add(acceleration)
+      }
+    }
+  }
+)
+
+const avoidanceSystem = system(
+  ecs.world.archetype("avoidance", "velocity", "transform"),
+  (entities) => {
+    for (const { avoidance, velocity, transform } of entities) {
+      /* Find neighbors */
+      const candidates = avoidance!.archetype.entities
+      avoidance!.neighbors = candidates.filter(
+        (candidate) =>
+          candidate.transform!.position.distanceTo(transform!.position) <= avoidance!.range
+      )
+
+      /* Avoid neighbors */
+      if (avoidance!.neighbors.length) {
+        const acceleration = avoidance!.neighbors
+          .reduce(
+            (acc, neighbor) => acc.add(neighbor.transform!.position).sub(transform!.position),
+            tmpvec3.setScalar(0)
+          )
+          .divideScalar(-avoidance!.neighbors.length)
+          .normalize()
+          .multiplyScalar(2)
+
+        velocity!.add(acceleration)
       }
     }
   }

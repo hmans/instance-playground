@@ -1,4 +1,4 @@
-import { IEntity, Tag } from "miniplex"
+import { Archetype, ComponentName, IEntity, Tag } from "miniplex"
 import { createECS } from "miniplex/react"
 import { Object3D, Vector3 } from "three"
 
@@ -13,6 +13,11 @@ export type RevadeEntity = Partial<{
   velocityLimit: number
   velocityDamping: number
   attractors: RevadeEntity[]
+  avoidance: {
+    range: number
+    neighbors: RevadeEntity[]
+    archetype: Archetype<RevadeEntity>
+  }
 }> &
   IEntity
 
