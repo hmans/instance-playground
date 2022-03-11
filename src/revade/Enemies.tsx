@@ -19,7 +19,7 @@ export const Enemies = () => (
         <ecs.Component name="attractors" data={[]} />
         <ecs.Component
           name="avoidance"
-          data={{ range: 3, neighbors: [], archetype: ecs.world.archetype("enemy") }}
+          data={{ range: 1, neighbors: [], archetype: ecs.world.archetype("enemy") }}
         />
       </>
     )}

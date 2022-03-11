@@ -93,6 +93,7 @@ const followAttractors = system(
             tmpvec3.setScalar(0)
           )
           .divideScalar(attractors!.length)
+          .multiplyScalar(0.5)
 
         velocity?.add(acceleration)
       }
