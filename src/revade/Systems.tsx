@@ -157,8 +157,8 @@ function withArchetype<
   TQuery extends Query<TEntity>,
   TArgs extends any[]
 >(
-  archetype: Archetype<TEntity, TQuery>,
-  system: (entities: QueriedEntity<TEntity, TQuery>[], ...args: TArgs) => void
+  system: (entities: QueriedEntity<TEntity, TQuery>[], ...args: TArgs) => void,
+  archetype: Archetype<TEntity, TQuery>
 ) {
   const { entities } = archetype
   return (...args: TArgs) => {
@@ -166,11 +166,10 @@ function withArchetype<
   }
 }
 
-function withInterval<
-  TEntity extends IEntity,
-  TQuery extends Query<TEntity>,
-  TArgs extends any[]
->(interval: number, system: (...args: TArgs) => void) {
+function withInterval<TEntity extends IEntity, TArgs extends any[]>(
+  system: (...args: TArgs) => void,
+  interval: number
+) {
   let lastTime = performance.now()
 
   return (...args: TArgs) => {
@@ -193,6 +192,6 @@ const autoRotateSystemNaked = (
 
 /* Compose some behavior into this sytem, eg. invoking it with a specific archetype, or configuring an interval: */
 const autoRotateSystem = withInterval(
-  300,
-  withArchetype(ecs.world.archetype("transform", "autorotate"), autoRotateSystemNaked)
+  withArchetype(autoRotateSystemNaked, ecs.world.archetype("transform", "autorotate")),
+  300
 )
