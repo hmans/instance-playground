@@ -161,12 +161,13 @@ function withArchetype<
   archetype: Archetype<TEntity, TQuery>
 ) {
   const { entities } = archetype
+
   return (...args: TArgs) => {
     system(entities, ...args)
   }
 }
 
-function withInterval<TEntity extends IEntity, TArgs extends any[]>(
+function withInterval<TArgs extends any[]>(
   system: (...args: TArgs) => void,
   interval: number
 ) {
