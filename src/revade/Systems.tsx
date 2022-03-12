@@ -125,11 +125,12 @@ const avoidanceSystem = system(
   (entities) => {
     for (const { avoidance, velocity, transform, spatialHashing } of entities) {
       /* Find neighbors */
-      const candidates = spatialHashing.getNearbyEntities(transform.position, avoidance.range)
-      avoidance.neighbors = candidates.filter(
-        (candidate) =>
-          candidate.transform?.position.distanceTo(transform!.position) <= avoidance.range
-      )
+      avoidance.neighbors = spatialHashing
+        .getNearbyEntities(transform.position, avoidance.range, 10)
+        .filter(
+          (candidate) =>
+            candidate.transform?.position.distanceTo(transform!.position) <= avoidance.range
+        )
 
       /* Avoid neighbors */
       if (avoidance.neighbors.length) {
