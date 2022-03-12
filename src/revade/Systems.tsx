@@ -24,10 +24,21 @@ export const Systems = () => {
     autoSqueezeSystem(dt)
 
     spawnNewEnemiesSystem()
+    spatialHashGridSystem()
   })
 
   return null
 }
+
+const spatialHashGridSystem = system(
+  ecs.world.archetype("transform", "spatialHashing"),
+  (entities) => {
+    for (const entity of entities) {
+      const { transform, spatialHashing } = entity
+      spatialHashing.set(entity, transform.position)
+    }
+  }
+)
 
 const playerInputSystem = system(
   ecs.world.archetype("player", "transform", "velocity"),
@@ -110,11 +121,11 @@ const followAttractors = system(
 )
 
 const avoidanceSystem = system(
-  ecs.world.archetype("avoidance", "velocity", "transform"),
+  ecs.world.archetype("avoidance", "velocity", "transform", "spatialHashing"),
   (entities) => {
-    for (const { avoidance, velocity, transform } of entities) {
+    for (const { avoidance, velocity, transform, spatialHashing } of entities) {
       /* Find neighbors */
-      const candidates = avoidance.archetype.entities
+      const candidates = spatialHashing.getNearbyEntities(transform.position, avoidance.range)
       avoidance.neighbors = candidates.filter(
         (candidate) =>
           candidate.transform?.position.distanceTo(transform!.position) <= avoidance.range
