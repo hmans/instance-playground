@@ -76,7 +76,7 @@ const spawnNewEnemies = () => {
   ecs.world.createEntity({ enemy: Tag })
 }
 
-const spawnNewEnemiesSystem = withInterval(0.2, spawnNewEnemies)
+const spawnNewEnemiesSystem = withInterval(spawnNewEnemies, 0.2)
 
 const findAttractorsForEnemies = system(
   ecs.world.archetype("enemy", "attractors"),
