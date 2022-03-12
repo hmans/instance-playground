@@ -1,10 +1,10 @@
 import { VectorControl } from "@hmans/controlfreak"
 import { useFrame } from "@react-three/fiber"
-import { Tag } from "miniplex"
+import { Archetype, EntityWithComponents, IEntity, QueriedEntity, Query, Tag } from "miniplex"
 import { Vector3 } from "three"
-import { system, withInterval } from "../lib/systems"
+import { system } from "../lib/systems"
 import { controller } from "./controller"
-import { ecs } from "./state"
+import { ecs, RevadeEntity } from "./state"
 
 const tmpvec3 = new Vector3()
 
@@ -137,15 +137,6 @@ const avoidanceSystem = system(
   }
 )
 
-const autoRotateSystem = system(
-  ecs.world.archetype("transform", "autorotate"),
-  (entities, dt: number) => {
-    for (const { transform, autorotate } of entities) {
-      transform.rotation.x = transform.rotation.y += dt * autorotate.speed
-    }
-  }
-)
-
 const autoSqueezeSystem = system(
   ecs.world.archetype("transform", "autosqueeze"),
   (entities, dt: number) => {
@@ -155,4 +146,53 @@ const autoSqueezeSystem = system(
       transform.scale.y = 1 + Math.sin(autosqueeze.t) * 0.2
     }
   }
+)
+
+/*
+EXPERIMENTS!
+*/
+
+function withArchetype<
+  TEntity extends IEntity,
+  TQuery extends Query<TEntity>,
+  TArgs extends any[]
+>(
+  archetype: Archetype<TEntity, TQuery>,
+  system: (entities: QueriedEntity<TEntity, TQuery>[], ...args: TArgs) => void
+) {
+  const { entities } = archetype
+  return (...args: TArgs) => {
+    system(entities, ...args)
+  }
+}
+
+function withInterval<
+  TEntity extends IEntity,
+  TQuery extends Query<TEntity>,
+  TArgs extends any[]
+>(interval: number, system: (...args: TArgs) => void) {
+  let lastTime = performance.now()
+
+  return (...args: TArgs) => {
+    if (performance.now() >= lastTime + interval) {
+      lastTime += interval
+      system(...args)
+    }
+  }
+}
+
+/* Write a standalone system that accepts a list of entities and extra args. Easy to test! */
+const autoRotateSystemNaked = (
+  entities: EntityWithComponents<RevadeEntity, "transform" | "autorotate">[],
+  dt: number
+) => {
+  for (const { transform, autorotate } of entities) {
+    transform.rotation.x = transform.rotation.y += dt * autorotate.speed
+  }
+}
+
+/* Compose some behavior into this sytem, eg. invoking it with a specific archetype, or configuring an interval: */
+const autoRotateSystem = withInterval(
+  300,
+  withArchetype(ecs.world.archetype("transform", "autorotate"), autoRotateSystemNaked)
 )
