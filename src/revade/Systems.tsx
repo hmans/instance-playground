@@ -29,24 +29,27 @@ export const Systems = () => {
   return null
 }
 
-const playerInputSystem = system(ecs.world.archetype("player"), (entities, thrust = 1) => {
-  controller.update()
-  const move = controller.controls.move as VectorControl
+const playerInputSystem = system(
+  ecs.world.archetype("player", "transform", "velocity"),
+  (entities, thrust = 1) => {
+    controller.update()
+    const move = controller.controls.move as VectorControl
 
-  for (const entity of entities) {
-    entity.velocity?.add(tmpvec3.set(move.value.x, move.value.y, 0).multiplyScalar(thrust))
-    entity.transform!.quaternion.setFromUnitVectors(
-      new Vector3(0, 1, 0),
-      entity.velocity!.clone().normalize()
-    )
+    for (const entity of entities) {
+      entity.velocity.add(tmpvec3.set(move.value.x, move.value.y, 0).multiplyScalar(thrust))
+      entity.transform.quaternion.setFromUnitVectors(
+        new Vector3(0, 1, 0),
+        entity.velocity.clone().normalize()
+      )
+    }
   }
-})
+)
 
 const velocityLimitSystem = system(
   ecs.world.archetype("velocity", "velocityLimit"),
   (entities) => {
     for (const { velocity, velocityLimit } of entities) {
-      velocity!.clampLength(0, velocityLimit!)
+      velocity.clampLength(0, velocityLimit)
     }
   }
 )
@@ -55,7 +58,7 @@ const velocityDapmingSystem = system(
   ecs.world.archetype("velocity", "velocityDamping"),
   (entities) => {
     for (const { velocity, velocityDamping } of entities) {
-      velocity!.multiplyScalar(velocityDamping!)
+      velocity.multiplyScalar(velocityDamping)
     }
   }
 )
@@ -64,7 +67,7 @@ const velocitySystem = system(
   ecs.world.archetype("velocity", "transform"),
   (entities, dt: number) => {
     for (const { velocity, transform } of entities) {
-      transform!.position.add(tmpvec3.copy(velocity!).multiplyScalar(dt))
+      transform.position.add(tmpvec3.copy(velocity).multiplyScalar(dt))
     }
   }
 )
@@ -91,14 +94,13 @@ const followAttractors = system(
   ecs.world.archetype("transform", "velocity", "attractors"),
   (entities) => {
     for (const { transform, velocity, attractors } of entities) {
-      if (attractors!.length) {
-        const acceleration = attractors!
+      if (attractors.length) {
+        const acceleration = attractors
           .reduce(
-            (acc, attractor) =>
-              acc.add(attractor.transform!.position).sub(transform!.position),
+            (acc, attractor) => acc.add(attractor.transform!.position).sub(transform.position),
             tmpvec3.setScalar(0)
           )
-          .divideScalar(attractors!.length)
+          .divideScalar(attractors.length)
           .multiplyScalar(0.5)
 
         velocity?.add(acceleration)
@@ -112,15 +114,15 @@ const avoidanceSystem = system(
   (entities) => {
     for (const { avoidance, velocity, transform } of entities) {
       /* Find neighbors */
-      const candidates = avoidance!.archetype.entities
-      avoidance!.neighbors = candidates.filter(
+      const candidates = avoidance.archetype.entities
+      avoidance.neighbors = candidates.filter(
         (candidate) =>
           candidate.transform!.position.distanceTo(transform!.position) <= avoidance!.range
       )
 
       /* Avoid neighbors */
-      if (avoidance!.neighbors.length) {
-        const acceleration = avoidance!.neighbors
+      if (avoidance.neighbors.length) {
+        const acceleration = avoidance.neighbors
           .reduce(
             (acc, neighbor) => acc.add(neighbor.transform!.position).sub(transform!.position),
             tmpvec3.setScalar(0)
@@ -129,7 +131,7 @@ const avoidanceSystem = system(
           .normalize()
           .multiplyScalar(2)
 
-        velocity!.add(acceleration)
+        velocity.add(acceleration)
       }
     }
   }
@@ -139,7 +141,7 @@ const autoRotateSystem = system(
   ecs.world.archetype("transform", "autorotate"),
   (entities, dt: number) => {
     for (const { transform, autorotate } of entities) {
-      transform!.rotation.x = transform!.rotation.y += dt * autorotate!.speed
+      transform.rotation.x = transform.rotation.y += dt * autorotate.speed
     }
   }
 )
@@ -148,9 +150,9 @@ const autoSqueezeSystem = system(
   ecs.world.archetype("transform", "autosqueeze"),
   (entities, dt: number) => {
     for (const { transform, autosqueeze } of entities) {
-      autosqueeze!.t += dt * autosqueeze!.speed
-      transform!.scale.x = 1 + Math.cos(autosqueeze!.t) * 0.2
-      transform!.scale.y = 1 + Math.sin(autosqueeze!.t) * 0.2
+      autosqueeze.t += dt * autosqueeze.speed
+      transform.scale.x = 1 + Math.cos(autosqueeze.t) * 0.2
+      transform.scale.y = 1 + Math.sin(autosqueeze.t) * 0.2
     }
   }
 )
