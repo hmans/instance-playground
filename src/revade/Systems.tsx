@@ -76,7 +76,7 @@ const spawnNewEnemies = () => {
   ecs.world.createEntity({ enemy: Tag })
 }
 
-const spawnNewEnemiesSystem = withInterval(spawnNewEnemies, 0.2)
+const spawnNewEnemiesSystem = withInterval(spawnNewEnemies, 1)
 
 const findAttractorsForEnemies = system(
   ecs.world.archetype("enemy", "attractors"),
@@ -172,10 +172,11 @@ function withInterval<TArgs extends any[]>(
   interval: number
 ) {
   let lastTime = performance.now()
+  const intervalMs = interval * 1000
 
   return (...args: TArgs) => {
-    if (performance.now() >= lastTime + interval) {
-      lastTime += interval
+    if (performance.now() >= lastTime + intervalMs) {
+      lastTime += intervalMs
       system(...args)
     }
   }
@@ -192,7 +193,7 @@ const autoRotateSystemNaked = (
 }
 
 /* Compose some behavior into this sytem, eg. invoking it with a specific archetype, or configuring an interval: */
-const autoRotateSystem = withInterval(
-  withArchetype(autoRotateSystemNaked, ecs.world.archetype("transform", "autorotate")),
-  300
+const autoRotateSystem = withArchetype(
+  autoRotateSystemNaked,
+  ecs.world.archetype("transform", "autorotate")
 )
