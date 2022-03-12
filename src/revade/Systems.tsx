@@ -23,7 +23,7 @@ export const Systems = () => {
     autoRotateSystem(dt)
     autoSqueezeSystem(dt)
 
-    spawnNewEnemiesSystem(dt)
+    spawnNewEnemiesSystem()
   })
 
   return null
