@@ -117,14 +117,14 @@ const avoidanceSystem = system(
       const candidates = avoidance.archetype.entities
       avoidance.neighbors = candidates.filter(
         (candidate) =>
-          candidate.transform!.position.distanceTo(transform!.position) <= avoidance!.range
+          candidate.transform?.position.distanceTo(transform!.position) <= avoidance.range
       )
 
       /* Avoid neighbors */
       if (avoidance.neighbors.length) {
         const acceleration = avoidance.neighbors
           .reduce(
-            (acc, neighbor) => acc.add(neighbor.transform!.position).sub(transform!.position),
+            (acc, neighbor) => acc.add(neighbor.transform!.position).sub(transform.position),
             tmpvec3.setScalar(0)
           )
           .divideScalar(-avoidance!.neighbors.length)
